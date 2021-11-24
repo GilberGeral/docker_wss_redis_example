@@ -1,0 +1,32 @@
+
+:root {
+
+  --bg-color-green: #28a745;
+  --border-color-green: #28a745;
+  --border-color-yellow: #fadd00;
+  
+}
+
+body, html {
+  padding: 0px !important;
+  margin: 0px !important;
+}
+
+#card_signal{
+  border : 3px solid #fff;
+}
+
+.card_signal_loading{
+  border : 3px solid  blue !important;
+}
+
+
+.noselect, .noSelect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}

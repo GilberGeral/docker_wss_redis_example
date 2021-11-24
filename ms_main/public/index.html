@@ -1,0 +1,98 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/public/main.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js" integrity="sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+<body>
+
+<div class="jumbotron text-center">
+  <h1>Monitoreo promedio visitas a XXX</h1>
+  <span id="mOnline" name="mOnline" class="text-danger">No conectado</span> 
+</div>
+  
+<div class="container">
+  <div class="row">
+    
+    <div class="col-12 col-sm-12 col-md-4">
+      <h3>Estado actual</h3>        
+      
+      <div class="card-deck">
+        
+        
+        <div class="card bg-success" id="card_signal" name="card_signal">
+          <div class="card-body text-center">
+            <h2 class="card-text" id="dTitulo" name="dTitulo">33.45</h2>
+            <h4>Promedio</h4><br>            
+            <span class="text-white" id="dTime" name="dTime">
+              2021-11-25 09:00:56 <br>Ultimo registro
+            </span>
+          </div>
+        </div>
+        
+      </div>
+
+    </div>
+
+    <div class="col-12 col-sm-12 col-md-4">
+      <h3>Configuracion</h3>
+      
+      <ul class="list-group">
+        <li class="list-group-item">
+          Activar alarma tras 
+          <select class="w-25" name="intentos_alarm" id="intentos_alarm">
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="7">7</option>
+            <option value="10">10</option>
+          </select>
+          intentos sin datos. <br>
+          
+        </li>
+        <li class="list-group-item">
+          
+          
+          <label for="set_alarm" class="noSelect">Activar alarma sonora ? </label>
+          <input type="checkbox" id="set_alarm" name="set_alarm" class="float-right">
+          <br>
+          <small>*apagada siempre y encender manualmente...</small>
+
+        </li>
+        
+      </ul>
+
+    </div>
+
+    <div class="col-12 col-sm-12 col-md-4">
+      <h3>Historico</h3>
+      <small>10 registros mas recientes</small>
+      
+      <ul class="list-group" id="lHistorico" name="lHistorico">
+        <li class="list-group-item">Cargando...</li>        
+      </ul>
+
+    </div>
+
+
+  </div>
+</div>
+
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public/main.js"></script>
+
+</body>
+</html>
