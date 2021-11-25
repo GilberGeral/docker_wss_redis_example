@@ -7,15 +7,15 @@ let hasSound = 0;
 let intentos_fail =0;
 let historic = [];
 let alarm_sound = {};
+let socket_started = false;
 
 const CLASS_LOADING = 'card_signal_loading';
 const FORMAT_DATETIME = "YYYY-MM-DD HH:mm:ss";
-const LOOP_MONITOR = 3000;
+const LOOP_MONITOR = 10000;
 const LARGO_HISTORICO = 10;
 
 function send_string( _string, _key){
-  socket.emit(_key, _string);
-  
+  socket.emit(_key, _string);  
 }
 
 function setAlarmSound(){
@@ -33,6 +33,7 @@ function setAlarmSound(){
 }
 
 function loop(){
+  if( !socket_started )return;
   let _now = moment();
 
 
@@ -72,8 +73,6 @@ function updateHistorical(_data){
     historic.shift();
   }
 
-  
-
   $("#lHistorico").empty();
   // let _histo_reversed = historic;
   // _histo_reversed.reverse();
@@ -94,11 +93,87 @@ function setIntentos(){
   localStorage.setItem("intentos",intentos_alarm);
 }
 
+function startSocket(){
+  socket = io();
+
+  socket.on("connect", () => {
+    $("#mOnline").html("Cada 10 segundos");
+    $("#mOnline").removeClass("text-danger");
+  });
+
+  socket.io.on("reconnect", (attempt) => {
+    $("#mOnline").html("Cada 10 segundos");
+    $("#mOnline").removeClass("text-danger");
+    console.log( "reconectado " );
+  });
+
+  socket.on("disconnect", () => {
+    $("#mOnline").html("No conectado");
+    $("#mOnline").addClass("text-danger");
+  });
+
+
+  socket.on('sinc', function(msg) {
+    // console.log( "llego " );
+    // console.log( msg );
+    socket_started = true;
+
+    let _dt = JSON.parse(msg);
+    // console.log( _dt );
+    $("#card_signal").addClass(CLASS_LOADING);
+
+    $("#dTitulo").html(_dt.promedio);
+    $("#dTime").html(_dt.now);
+
+    last_register_server = moment(_dt.now,FORMAT_DATETIME);
+    updateHistorical(_dt);
+
+    setTimeout(() => {
+      $("#card_signal").removeClass(CLASS_LOADING);
+    }, 1000);
+
+  });//fin de sinc de socket
+
+}
+
+function loadBigHistorical(){
+  console.log( "en get historical large" );
+
+  $("#lHistorico").empty();
+
+  $.ajax({
+    url: "/getHisto",
+    method:"GET",
+  }).done(function( _msg ) {
+      
+    console.log( "llego de histo");
+    console.log( _msg );
+    let _data = JSON.parse(_msg);
+    if( _data.dt.length > 0 ){
+      _data.dt.forEach(_reg => {
+        updateHistorical(_reg);
+      });
+    }else{
+      let _str = `<li class="list-group-item">Sin datos registrados</i>)</li>`;
+      $("#lHistorico").append(_str);
+    }
+    
+    startSocket();
+
+  }).fail((_err)=>{
+    console.log( "error" );
+    console.log( _err );
+  });
+
+  
+
+}
+
 function init(){
   console.log( "en init " );
   if( localStorage.getItem("intentos") == undefined | localStorage.getItem("intentos") == null ){
-    localStorage.setItem("intentos","1");
-    $("#intentos_alarm").val("1");
+    localStorage.setItem("intentos","2");
+    $("#intentos_alarm").val("2");
   }else{
     intentos_alarm = localStorage.getItem("intentos");
     $("#intentos_alarm").val(intentos_alarm);
@@ -127,45 +202,9 @@ function init(){
     setAlarmSound();
   });
 
+  loadBigHistorical();
   //set socket
-  socket = io();
-
-  socket.on("connect", () => {
-    $("#mOnline").html("Cada 10 segundos");
-    $("#mOnline").removeClass("text-danger");
-  });
-
-  socket.io.on("reconnect", (attempt) => {
-    $("#mOnline").html("Cada 10 segundos");
-    $("#mOnline").removeClass("text-danger");
-    console.log( "reconectado " );
-  });
-
-  socket.on("disconnect", () => {
-    $("#mOnline").html("No conectado");
-    $("#mOnline").addClass("text-danger");
-  });
-
-
-  socket.on('sinc', function(msg) {
-    // console.log( "llego " );
-    // console.log( msg );
-    let _dt = JSON.parse(msg);
-    // console.log( _dt );
-    $("#card_signal").addClass(CLASS_LOADING);
-
-    $("#dTitulo").html(_dt.promedio);
-    $("#dTime").html(_dt.now);
-
-    last_register_server = moment(_dt.now,FORMAT_DATETIME);
-    updateHistorical(_dt);
-
-    setTimeout(() => {
-      $("#card_signal").removeClass(CLASS_LOADING);
-    }, 1000);
-
-  });//fin de sinc de socket
-
+  
 
   alarm_sound = new Howl({
     src: ['/public/alarm.mp3', '/public/alarm.ogg']
